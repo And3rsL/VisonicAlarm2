@@ -154,6 +154,13 @@ class MotionDevice(Device):
         """ Returns the current state of the motion. """
         return 'UKNOWN'
 
+class GenericDevice(Device):
+    """ Generic device class definition. """
+
+    @property
+    def state(self):
+        """ Returns the current state of the motion. """
+        return 'UKNOWN'
 
 class System(object):
     """ Class definition of the main alarm system. """
@@ -204,6 +211,11 @@ class System(object):
     def state(self):
         """ Current state of the alarm system. """
         return self.__system_state
+
+    @property
+    def alarm(self):
+        """ Current alarm of the alarm system. """
+        return self.__system_alarm
 
     @property
     def active(self):
@@ -414,14 +426,21 @@ class System(object):
 
         if alarms is None:
             self.__system_state = partition['state']
+            self.__system_alarm = False
         else:
-            self.__system_state = 'Alarm'
+            state = partition['state']
+            self.__system_alarm = True
+
+            if state == 'Home' or state == 'Away':
+                self.__system_state = 'Alarm'
+            else:
+                self.__system_state = partition['state']
 
     def update_troubles(self):
         """ Update all variables that are populated by the call
         to the troubles() API method. """
         troubles = self.__api.get_troubles()
-        #partition = troubles['partitions'][0]
+
         self.__system_troubles = troubles
 
     def update_devices(self):
