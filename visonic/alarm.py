@@ -324,6 +324,8 @@ class System(object):
                 data['action'] = 'ArmHome'
             elif last_event['type_id'] == 86:
                 data['action'] = 'ArmAway'
+            elif last_event['type_id'] == 2:
+                data['action'] = 'Alarm'
             else:
                 data['action'] = 'Unknown type_id: {0}'.format(
                     str(last_event['type_id']))
@@ -422,16 +424,15 @@ class System(object):
         self.__system_active = partition['active']
         self.__system_connected = status['is_connected']
         
-        alarms = self.__api.get_alarms()
+        alarms_events = self.__api.get_alarms()
 
-        if alarms is None:
+        if alarms_events is None or len(alarms_events) == 0:
             self.__system_state = partition['state']
             self.__system_alarm = False
         else:
             state = partition['state']
             self.__system_alarm = True
-
-            if state == 'Home' or state == 'Away':
+            if state == 'Home' or state == 'Home Instant' or state == 'Away' or state == 'Away Instant':
                 self.__system_state = 'Alarm'
             else:
                 self.__system_state = partition['state']
