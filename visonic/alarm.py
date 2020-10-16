@@ -385,66 +385,68 @@ class System(object):
         self.__system_devices.clear()
 
         for device in devices:
-            if device['subtype'] == 'CONTACT_AUX' or device['subtype'] == 'CONTACT':
-                contact_device = ContactDevice(
-                    id=device['id'],
-                    name=device['name'],
-                    zone=device['zone_type'],
-                    device_type=device['device_type'],
-                    subtype=device['subtype'],
-                    preenroll=device['preenroll'],
-                    warnings=device['warnings'],
-                    partitions=device['partitions']
-                )
-                self.__system_devices.append(contact_device)
-            elif device['subtype'] == 'MOTION_CAMERA':
-                camera_device = CameraDevice(
-                    id=device['id'],
-                    name=device['name'],
-                    zone=device['zone_type'],
-                    device_type=device['device_type'],
-                    subtype=device['subtype'],
-                    preenroll=device['preenroll'],
-                    warnings=device['warnings'],
-                    partitions=device['partitions']
-                )
-                self.__system_devices.append(camera_device)
-            elif device['subtype'] == 'MOTION' or device['subtype'] == 'CURTAIN':
-                motion_device = MotionDevice(
-                    id=device['id'],
-                    name=device['name'],
-                    zone=device['zone_type'],
-                    device_type=device['device_type'],
-                    subtype=device['subtype'],
-                    preenroll=device['preenroll'],
-                    warnings=device['warnings'],
-                    partitions=device['partitions']
-                )
-                self.__system_devices.append(motion_device)
-            elif device['subtype'] == 'SMOKE':
-                smoke_device = SmokeDevice(
-                    id=device['id'],
-                    name=device['name'],
-                    zone=device['zone_type'],
-                    device_type=device['device_type'],
-                    subtype=device['subtype'],
-                    preenroll=device['preenroll'],
-                    warnings=device['warnings'],
-                    partitions=device['partitions']
-                )
-                self.__system_devices.append(smoke_device)
-            else:
-                generic_device = GenericDevice(
-                    id=device['id'],
-                    name=device['name'],
-                    zone=device['zone_type'],
-                    device_type=device['device_type'],
-                    subtype=device['subtype'],
-                    preenroll=device['preenroll'],
-                    warnings=device['warnings'],
-                    partitions=device['partitions']
-                )
-                self.__system_devices.append(generic_device)
+            if device is not None:
+                if device['subtype'] is not None:
+                    if 'CONTACT' in device['subtype']:
+                        contact_device = ContactDevice(
+                            id=device['id'],
+                            name=device['name'],
+                            zone=device['zone_type'],
+                            device_type=device['device_type'],
+                            subtype=device['subtype'],
+                            preenroll=device['preenroll'],
+                            warnings=device['warnings'],
+                            partitions=device['partitions']
+                        )
+                        self.__system_devices.append(contact_device)
+                    elif device['subtype'] == 'MOTION_CAMERA':
+                        camera_device = CameraDevice(
+                            id=device['id'],
+                            name=device['name'],
+                            zone=device['zone_type'],
+                            device_type=device['device_type'],
+                            subtype=device['subtype'],
+                            preenroll=device['preenroll'],
+                            warnings=device['warnings'],
+                            partitions=device['partitions']
+                        )
+                        self.__system_devices.append(camera_device)
+                    elif device['subtype'] == 'MOTION' or device['subtype'] == 'CURTAIN':
+                        motion_device = MotionDevice(
+                            id=device['id'],
+                            name=device['name'],
+                            zone=device['zone_type'],
+                            device_type=device['device_type'],
+                            subtype=device['subtype'],
+                            preenroll=device['preenroll'],
+                            warnings=device['warnings'],
+                            partitions=device['partitions']
+                        )
+                        self.__system_devices.append(motion_device)
+                    elif device['subtype'] == 'SMOKE':
+                        smoke_device = SmokeDevice(
+                            id=device['id'],
+                            name=device['name'],
+                            zone=device['zone_type'],
+                            device_type=device['device_type'],
+                            subtype=device['subtype'],
+                            preenroll=device['preenroll'],
+                            warnings=device['warnings'],
+                            partitions=device['partitions']
+                        )
+                        self.__system_devices.append(smoke_device)
+                    else:
+                        generic_device = GenericDevice(
+                            id=device['id'],
+                            name=device['name'],
+                            zone=device['zone_type'],
+                            device_type=device['device_type'],
+                            subtype=device['subtype'],
+                            preenroll=device['preenroll'],
+                            warnings=device['warnings'],
+                            partitions=device['partitions']
+                        )
+                        self.__system_devices.append(generic_device)
 
 
 class API(object):
