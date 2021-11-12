@@ -199,6 +199,10 @@ class System(object):
                 return device
         return None
 
+    def get_process_status(self, token):
+        """ get process status from the alarm system """
+        return self.__api.get_process_status(token)
+
     def disarm(self):
         """ Send Disarm command to the alarm system. """
         return self.__api.disarm(self.__api.partition)
