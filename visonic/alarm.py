@@ -201,15 +201,15 @@ class System(object):
 
     def disarm(self):
         """ Send Disarm command to the alarm system. """
-        self.__api.disarm(self.__api.partition)
+        return self.__api.disarm(self.__api.partition)
 
     def arm_home(self):
         """ Send Arm Home command to the alarm system. """
-        self.__api.arm_home(self.__api.partition)
+        return self.__api.arm_home(self.__api.partition)
 
     def arm_away(self):
         """ Send Arm Away command to the alarm system. """
-        self.__api.arm_away(self.__api.partition)
+        return self.__api.arm_away(self.__api.partition)
 
     def connect(self):
         """ Connect to the alarm system and get the static system info. """
