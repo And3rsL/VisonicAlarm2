@@ -219,8 +219,13 @@ class System(object):
 
         if '8.0' in rest_versions:
             print('Rest API version 8.0 is supported.')
+            self.__api.setVersionUrls('8.0')
+        elif '9.0' in rest_versions:
+            print('Rest API version 9.0 is supported.')
+            self.__api.setVersionUrls('9.0')
         else:
-            raise Exception('Rest API version 8.0 is not supported by server.')
+            raise Exception('Rest API version 8.0 or 9.0 is not supported by server.')
+
 
         # Try to login and get a user token.
         self.__api.login()
@@ -502,27 +507,8 @@ class API(object):
         self.__user_email = user_email
         self.__user_password = user_password
 
-        # Visonic API URLs that should be used
-        self.__url_base = 'https://' + self.__hostname + '/rest_api/' + \
-                          self.__rest_version
-
         self.__url_version = 'https://' + self.__hostname + '/rest_api/version'
-
-        self.__url_panel_login = self.__url_base + '/panel/login'
-        self.__url_login = self.__url_base + '/auth'
-        self.__url_status = self.__url_base + '/status'
-        self.__url_alarms = self.__url_base + '/alarms'
-        self.__url_alerts = self.__url_base + '/alerts'
-        self.__url_troubles = self.__url_base + '/troubles'
-
-        self.__url_panel_info = self.__url_base + '/panel_info'
-        self.__url_events = self.__url_base + '/events'
-        self.__url_wakeup_sms = self.__url_base + '/wakeup_sms'
-        self.__url_all_devices = self.__url_base + '/devices'
-        self.__url_set_state = self.__url_base + '/set_state'
-        self.__url_locations = self.__url_base + '/locations'
-        self.__url_process_status = self.__url_base + '/process_status'
-
+        
         # Create a new session
         self.__session = requests.session()
 
@@ -666,6 +652,28 @@ class API(object):
         return self.__send_get_request(self.__url_version,
                                        with_user_token=False,
                                        with_session_token=False)
+
+    def setVersionUrls(self, version):
+        self.__rest_version = version
+
+         # Visonic API URLs that should be used
+        self.__url_base = 'https://' + self.__hostname + '/rest_api/' + \
+                          self.__rest_version
+
+        self.__url_panel_login = self.__url_base + '/panel/login'
+        self.__url_login = self.__url_base + '/auth'
+        self.__url_status = self.__url_base + '/status'
+        self.__url_alarms = self.__url_base + '/alarms'
+        self.__url_alerts = self.__url_base + '/alerts'
+        self.__url_troubles = self.__url_base + '/troubles'
+
+        self.__url_panel_info = self.__url_base + '/panel_info'
+        self.__url_events = self.__url_base + '/events'
+        self.__url_wakeup_sms = self.__url_base + '/wakeup_sms'
+        self.__url_all_devices = self.__url_base + '/devices'
+        self.__url_set_state = self.__url_base + '/set_state'
+        self.__url_locations = self.__url_base + '/locations'
+        self.__url_process_status = self.__url_base + '/process_status'
 
     def login(self):
         """ Try to login and get a user token. """
