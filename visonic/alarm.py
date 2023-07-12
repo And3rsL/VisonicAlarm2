@@ -223,8 +223,11 @@ class System(object):
         elif '9.0' in rest_versions:
             print('Rest API version 9.0 is supported.')
             self.__api.setVersionUrls('9.0')
+        elif '10.0' in rest_versions:
+            print('Rest API version 10.0 is supported.')
+            self.__api.setVersionUrls('10.0')
         else:
-            raise Exception('Rest API version 8.0 or 9.0 is not supported by server.')
+            raise Exception(f'Rest API version 8.0, 9.0 or 10.0 is not supported by server. Supported versions: {", ".join(rest_versions)}')
 
 
         # Try to login and get a user token.
