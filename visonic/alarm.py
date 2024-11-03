@@ -783,7 +783,8 @@ class API(object):
         """ Arm in Home mode and with Exit Delay. """
         arm_info = {
             'partition': -1,
-            'state': "HOME"
+            'state': "HOME",
+            'code': self.user_code
         }
         arm_json = json.dumps(arm_info, separators=(',', ':'))
 
@@ -802,7 +803,8 @@ class API(object):
         """ Arm in Away mode and with Exit Delay. """
         arm_info = {
             'partition': -1,
-            'state': "AWAY"
+            'state': "AWAY",
+            'code': self.user_code
         }
         arm_json = json.dumps(arm_info, separators=(',', ':'))
 
@@ -814,7 +816,8 @@ class API(object):
         """ Disarm the alarm system. """
         disarm_info = {
             'partition': -1,
-            'state': "DISARM"
+            'state': "DISARM",
+            'code': self.user_code
         }
         disarm_json = json.dumps(disarm_info, separators=(',', ':'))
 
