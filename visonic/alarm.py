@@ -116,6 +116,20 @@ class MotionDevice(Device):
         """ Returns the current state of the motion. """
         return 'UKNOWN'
 
+class KeyfobDevice(Device):
+    """ Keyfob device class definition. """
+
+    @property
+    def state(self):
+        """ Returns the current state of the keyfob. """
+        if self.warnings:
+            if 'OPENED' in str(self.warnings):
+                return 'opened'
+            else:
+                return 'closed'
+        else:
+            return 'closed'
+
 class GenericDevice(Device):
     """ Generic device class definition. """
 
@@ -353,7 +367,7 @@ class System(object):
     def update_status(self):
         """ Update all variables that are populated by the call
         to the status() API method. """
-    
+
         status = self.__api.get_status()
         partition = status['partitions'][0]
 
@@ -443,6 +457,21 @@ class System(object):
                             partitions=device['partitions']
                         )
                         self.__system_devices.append(smoke_device)
+                    elif 'KEYFOB' in device['subtype']:
+                        zone_type=device['zone_type']
+                        if not zone_type:
+                            zone_type = ""
+                        keyfob_device = KeyfobDevice(
+                            id=device['id'],
+                            name=device['name'],
+                            zone=zone_type,
+                            device_type=device['device_type'],
+                            subtype=device['subtype'],
+                            preenroll=device['preenroll'],
+                            warnings=device['warnings'],
+                            partitions=device['partitions']
+                        )
+                        self.__system_devices.append(keyfob_device)
                     else:
                         generic_device = GenericDevice(
                             id=device['id'],
@@ -511,7 +540,7 @@ class API(object):
         self.__user_password = user_password
 
         self.__url_version = 'https://' + self.__hostname + '/rest_api/version'
-        
+
         # Create a new session
         self.__session = requests.session()
 
@@ -589,7 +618,7 @@ class API(object):
         logging.debug(headers)
         logging.debug(data_json)
         logging.debug('=== END REQUEST ===')
-        
+
         # Perform the request and log an exception
         # if the response is not OK (HTML 200)
         logging.debug('=== BEGIN RESPONSE ===')
@@ -696,7 +725,7 @@ class API(object):
 
     def panel_login(self):
         """ Try to panel login and get a session token. """
-        
+
         # Setup authentication information
         panel_login_info = {
             'user_code': self.__user_code,
@@ -704,12 +733,12 @@ class API(object):
             'app_id': self.__app_id,
             'panel_serial': self.__panel_id
         }
-        
+
         panel_login_json = json.dumps(panel_login_info, separators=(',', ':'))
         res = self.__send_post_request(self.__url_panel_login, panel_login_json,
                                         with_user_token=True,
                                         with_session_token=False)
-        
+
         self.__session_token = res['session_token']
 
     def is_logged_in(self):
