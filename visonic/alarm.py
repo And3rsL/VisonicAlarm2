@@ -18,19 +18,21 @@ class Device(object):
     __name = None
     __zone = None
     __device_type = None
+    __device_number = None
     __subtype = None
     __preenroll = None
     __warnings = None
     __partitions = None
 
     def __init__(self, id, name, zone, device_type, subtype,
-                 preenroll, warnings, partitions):
+                 preenroll, warnings, partitions, device_number=None):
         """ Set the private variable values on instantiation. """
 
         self.__id = id
         self.__name = name
         self.__zone = zone
         self.__device_type = device_type
+        self.__device_number = device_number
         self.__subtype = subtype
         self.__preenroll = preenroll
         self.__warnings = warnings
@@ -56,6 +58,11 @@ class Device(object):
     def device_type(self):
         """ Device: device type. """
         return self.__device_type
+
+    @property
+    def device_number(self):
+        """ Device: device type. """
+        return self.__device_number
 
     @property
     def subtype(self):
@@ -445,7 +452,7 @@ class System(object):
                             partitions=device['partitions']
                         )
                         self.__system_devices.append(motion_device)
-                    elif device['subtype'] == 'SMOKE':
+                    elif 'SMOKE' in device['subtype']:
                         smoke_device = SmokeDevice(
                             id=device['id'],
                             name=device['name'],
@@ -469,7 +476,8 @@ class System(object):
                             subtype=device['subtype'],
                             preenroll=device['preenroll'],
                             warnings=device['warnings'],
-                            partitions=device['partitions']
+                            partitions=device['partitions'],
+                            device_number=device['device_number']
                         )
                         self.__system_devices.append(keyfob_device)
                     else:
