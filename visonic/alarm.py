@@ -61,7 +61,7 @@ class Device(object):
 
     @property
     def device_number(self):
-        """ Device: device type. """
+        """ Device: keyfob number. """
         return self.__device_number
 
     @property
@@ -266,6 +266,10 @@ class System(object):
         self.__system_model = gpi['model']
 
         self.update_status()
+
+    def get_events(self, timestamp_hour_offset=0):
+        """ Get the list of events. """
+        return self.__api.get_events()
 
     def get_last_event(self, timestamp_hour_offset=0):
         """ Get the last event. """
