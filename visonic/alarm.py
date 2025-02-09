@@ -239,18 +239,18 @@ class System(object):
         rest_versions = self.__api.get_version_info()['rest_versions']
 
         if '8.0' in rest_versions:
-            print('Rest API version 8.0 is supported.')
+            print('Visonics Rest API version 8.0 is supported.')
             self.__api.setVersionUrls('8.0')
         elif '9.0' in rest_versions:
-            print('Rest API version 9.0 is supported.')
+            print('Visonics Rest API version 9.0 is supported.')
             self.__api.setVersionUrls('9.0')
         elif '10.0' in rest_versions:
-            print('Rest API version 10.0 is supported.')
+            print('Visonics Rest API version 10.0 is supported.')
         elif '12.0' in rest_versions:
-            print('Rest API version 12.0 is supported.')
+            print('Visonics Rest API version 12.0 is supported.')
             self.__api.setVersionUrls('12.0')
         else:
-            raise Exception(f'Rest API version 8.0, 9.0 or 10.0 is not supported by server. Supported versions: {", ".join(rest_versions)}')
+            raise Exception(f'Visonics Rest API versions 8.0, 9.0, 10.0 or 12.0 are not supported by server. Supported versions: {", ".join(rest_versions)}')
 
 
         # Try to login and get a user token.
@@ -269,7 +269,7 @@ class System(object):
 
         self.update_status()
 
-    def get_events(self, timestamp_hour_offset=0):
+    def get_events(self):
         """ Get the list of events. """
         return self.__api.get_events()
 
