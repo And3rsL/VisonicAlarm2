@@ -10,6 +10,8 @@ from datetime import datetime
 from dateutil import parser
 from threading import Event
 
+_LOGGER = logging.getLogger(__name__)
+
 class Device(object):
     """ Base class definition of a device in the alarm system. """
 
@@ -239,15 +241,15 @@ class System(object):
         rest_versions = self.__api.get_version_info()['rest_versions']
 
         if '8.0' in rest_versions:
-            print('Visonics Rest API version 8.0 is supported.')
+            _LOGGER.info('Visonics Rest API version 8.0 is supported.')
             self.__api.setVersionUrls('8.0')
         elif '9.0' in rest_versions:
-            print('Visonics Rest API version 9.0 is supported.')
+            _LOGGER.info('Visonics Rest API version 9.0 is supported.')
             self.__api.setVersionUrls('9.0')
         elif '10.0' in rest_versions:
-            print('Visonics Rest API version 10.0 is supported.')
+            _LOGGER.info('Visonics Rest API version 10.0 is supported.')
         elif '12.0' in rest_versions:
-            print('Visonics Rest API version 12.0 is supported.')
+            _LOGGER.info('Visonics Rest API version 12.0 is supported.')
             self.__api.setVersionUrls('12.0')
         else:
             raise Exception(f'Visonics Rest API versions 8.0, 9.0, 10.0 or 12.0 are not supported by server. Supported versions: {", ".join(rest_versions)}')
@@ -483,7 +485,9 @@ class System(object):
                             preenroll=device['preenroll'],
                             warnings=device['warnings'],
                             partitions=device['partitions'],
-                            device_number=device['device_number']
+                            device_number=device['device_number'],
+                            # last_time_used=None,
+                            # last_operation=None
                         )
                         self.__system_devices.append(keyfob_device)
                     else:
