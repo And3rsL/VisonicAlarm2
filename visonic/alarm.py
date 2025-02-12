@@ -222,17 +222,21 @@ class System(object):
                 return device
         return None
 
+    def get_process_status(self, token):
+        """ get process status from the alarm system """
+        return self.__api.get_process_status(token)
+
     def disarm(self):
         """ Send Disarm command to the alarm system. """
-        self.__api.disarm(self.__api.partition)
+        return self.__api.disarm(self.__api.partition)
 
     def arm_home(self):
         """ Send Arm Home command to the alarm system. """
-        self.__api.arm_home(self.__api.partition)
+        return self.__api.arm_home(self.__api.partition)
 
     def arm_away(self):
         """ Send Arm Away command to the alarm system. """
-        self.__api.arm_away(self.__api.partition)
+        return self.__api.arm_away(self.__api.partition)
 
     def connect(self):
         """ Connect to the alarm system and get the static system info. """
