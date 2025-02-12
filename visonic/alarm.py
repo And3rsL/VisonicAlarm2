@@ -10,6 +10,8 @@ from datetime import datetime
 from dateutil import parser
 from threading import Event
 
+_LOGGER = logging.getLogger(__name__)
+
 class Device(object):
     """ Base class definition of a device in the alarm system. """
 
@@ -18,19 +20,21 @@ class Device(object):
     __name = None
     __zone = None
     __device_type = None
+    __device_number = None
     __subtype = None
     __preenroll = None
     __warnings = None
     __partitions = None
 
     def __init__(self, id, name, zone, device_type, subtype,
-                 preenroll, warnings, partitions):
+                 preenroll, warnings, partitions, device_number=None):
         """ Set the private variable values on instantiation. """
 
         self.__id = id
         self.__name = name
         self.__zone = zone
         self.__device_type = device_type
+        self.__device_number = device_number
         self.__subtype = subtype
         self.__preenroll = preenroll
         self.__warnings = warnings
@@ -56,6 +60,11 @@ class Device(object):
     def device_type(self):
         """ Device: device type. """
         return self.__device_type
+
+    @property
+    def device_number(self):
+        """ Device: keyfob number. """
+        return self.__device_number
 
     @property
     def subtype(self):
@@ -115,6 +124,20 @@ class MotionDevice(Device):
     def state(self):
         """ Returns the current state of the motion. """
         return 'UKNOWN'
+
+class KeyfobDevice(Device):
+    """ Keyfob device class definition. """
+
+    @property
+    def state(self):
+        """ Returns the current state of the keyfob. """
+        if self.warnings:
+            if 'OPENED' in str(self.warnings):
+                return 'opened'
+            else:
+                return 'closed'
+        else:
+            return 'closed'
 
 class GenericDevice(Device):
     """ Generic device class definition. """
@@ -218,18 +241,18 @@ class System(object):
         rest_versions = self.__api.get_version_info()['rest_versions']
 
         if '8.0' in rest_versions:
-            print('Rest API version 8.0 is supported.')
+            _LOGGER.info('Visonics Rest API version 8.0 is supported.')
             self.__api.setVersionUrls('8.0')
         elif '9.0' in rest_versions:
-            print('Rest API version 9.0 is supported.')
+            _LOGGER.info('Visonics Rest API version 9.0 is supported.')
             self.__api.setVersionUrls('9.0')
         elif '10.0' in rest_versions:
-            print('Rest API version 10.0 is supported.')
+            _LOGGER.info('Visonics Rest API version 10.0 is supported.')
         elif '12.0' in rest_versions:
-            print('Rest API version 12.0 is supported.')
+            _LOGGER.info('Visonics Rest API version 12.0 is supported.')
             self.__api.setVersionUrls('12.0')
         else:
-            raise Exception(f'Rest API version 8.0, 9.0 or 10.0 is not supported by server. Supported versions: {", ".join(rest_versions)}')
+            raise Exception(f'Visonics Rest API versions 8.0, 9.0, 10.0 or 12.0 are not supported by server. Supported versions: {", ".join(rest_versions)}')
 
 
         # Try to login and get a user token.
@@ -247,6 +270,10 @@ class System(object):
         self.__system_model = gpi['model']
 
         self.update_status()
+
+    def get_events(self):
+        """ Get the list of events. """
+        return self.__api.get_events()
 
     def get_last_event(self, timestamp_hour_offset=0):
         """ Get the last event. """
@@ -355,7 +382,7 @@ class System(object):
     def update_status(self):
         """ Update all variables that are populated by the call
         to the status() API method. """
-    
+
         status = self.__api.get_status()
         partition = status['partitions'][0]
 
@@ -433,7 +460,7 @@ class System(object):
                             partitions=device['partitions']
                         )
                         self.__system_devices.append(motion_device)
-                    elif device['subtype'] == 'SMOKE':
+                    elif 'SMOKE' in device['subtype']:
                         smoke_device = SmokeDevice(
                             id=device['id'],
                             name=device['name'],
@@ -445,6 +472,24 @@ class System(object):
                             partitions=device['partitions']
                         )
                         self.__system_devices.append(smoke_device)
+                    elif 'KEYFOB' in device['subtype']:
+                        zone_type=device['zone_type']
+                        if not zone_type:
+                            zone_type = ""
+                        keyfob_device = KeyfobDevice(
+                            id=device['id'],
+                            name=device['name'],
+                            zone=zone_type,
+                            device_type=device['device_type'],
+                            subtype=device['subtype'],
+                            preenroll=device['preenroll'],
+                            warnings=device['warnings'],
+                            partitions=device['partitions'],
+                            device_number=device['device_number'],
+                            # last_time_used=None,
+                            # last_operation=None
+                        )
+                        self.__system_devices.append(keyfob_device)
                     else:
                         generic_device = GenericDevice(
                             id=device['id'],
@@ -513,7 +558,7 @@ class API(object):
         self.__user_password = user_password
 
         self.__url_version = 'https://' + self.__hostname + '/rest_api/version'
-        
+
         # Create a new session
         self.__session = requests.session()
 
@@ -591,7 +636,7 @@ class API(object):
         logging.debug(headers)
         logging.debug(data_json)
         logging.debug('=== END REQUEST ===')
-        
+
         # Perform the request and log an exception
         # if the response is not OK (HTML 200)
         logging.debug('=== BEGIN RESPONSE ===')
@@ -698,7 +743,7 @@ class API(object):
 
     def panel_login(self):
         """ Try to panel login and get a session token. """
-        
+
         # Setup authentication information
         panel_login_info = {
             'user_code': self.__user_code,
@@ -706,12 +751,12 @@ class API(object):
             'app_id': self.__app_id,
             'panel_serial': self.__panel_id
         }
-        
+
         panel_login_json = json.dumps(panel_login_info, separators=(',', ':'))
         res = self.__send_post_request(self.__url_panel_login, panel_login_json,
                                         with_user_token=True,
                                         with_session_token=False)
-        
+
         self.__session_token = res['session_token']
 
     def is_logged_in(self):
