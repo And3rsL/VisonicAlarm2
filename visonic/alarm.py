@@ -241,8 +241,22 @@ class System(object):
     def connect(self):
         """ Connect to the alarm system and get the static system info. """
 
-        # Check that the server support API version 4.0 or 8.0.
-        rest_versions = self.__api.get_version_info()['rest_versions']
+        # Check that the server support API version 8.0 or higher.
+        rest_versions = self.__api.get_version_info()['rest_versions'][0]
+        
+        # Convert version string to float for comparison
+        try:
+            version_number = float(rest_versions)
+            if version_number < 8.0:
+                raise ValueError(f'API version {rest_versions} not supported. Minimum required version: 8.0')
+        except (ValueError, TypeError) as e:
+            if 'non supported' in str(e):
+                raise
+            raise ValueError(f'API version not valid: {rest_versions}')
+    
+        self.__api.setVersionUrls(rest_versions)
+        
+        logging.debug('Supported REST API versions: {0}'.format(rest_versions))
 
         # Try to login and get a user token.
         self.__api.login()
