@@ -8,6 +8,10 @@ setuptools.setup(
     description="A simple API library for the Visonic/Bentel/Tyco Alarm system.",
     url="https://github.com/And3rsL/VisonicAlarm2",
     packages=setuptools.find_packages(),
+    install_requires=[
+        "requests>=2.25.0",
+        "python-dateutil>=2.8.0",
+    ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
